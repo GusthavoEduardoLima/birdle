@@ -40,10 +40,7 @@ class Tile extends StatelessWidget {
     );
   }
 }
-
 class GamePage extends StatelessWidget {
-  GamePage({super.key});
-
   final Game _game = Game();
 
   @override
@@ -57,9 +54,15 @@ class GamePage extends StatelessWidget {
             Row(
               spacing: 5.0,
               children: [
-                for (var letter in guess) Tile(letter.char, letter.type)
-              ]
+                for (var letter in guess) Tile(letter.char, letter.type),
+              ],
             ),
+          GuessInput(
+            onSubmitGuess: (String guess) {
+              // TODO, handle guess
+              print(guess); // Temporary
+            },
+          ),
         ],
       ),
     );
@@ -70,8 +73,15 @@ class GuessInput extends StatelessWidget {
 
   final void Function(String) onSubmitGuess;
 
-  // NEW
   final TextEditingController _textEditingController = TextEditingController();
+
+  final FocusNode _focusNode = FocusNode();
+
+  void _onSubmit() {
+    onSubmitGuess(_textEditingController.text);
+    _textEditingController.clear();
+    _focusNode.requestFocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,15 +92,25 @@ class GuessInput extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               maxLength: 5,
-              decoration: InputDecoration(
+              focusNode: _focusNode,
+              autofocus: true,
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(35)),
                 ),
               ),
+              controller: _textEditingController,
+              onSubmitted: (String value) {
+                _onSubmit();
+              },
             ),
           ),
         ),
-        //
+        IconButton(
+          padding: EdgeInsets.zero,
+          icon: const Icon(Icons.arrow_circle_up),
+          onPressed: _onSubmit,
+        ),
       ],
     );
   }
